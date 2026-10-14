@@ -1,0 +1,7 @@
+{
+  "appId": "com.wealthlab.app",
+  "appName": "Wealth Lab",
+  "webDir": "www",
+  "server": { "androidScheme": "https" },
+  "plugins": { "CapacitorHttp": { "enabled": true } }
+}

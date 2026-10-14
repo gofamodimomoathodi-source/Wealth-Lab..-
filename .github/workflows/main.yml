@@ -1,0 +1,40 @@
+name: Build Wealth Lab APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Prepare web files
+        run: |
+          mkdir -p www
+          cp index.html www/index.html
+      - name: Install Capacitor
+        run: npm install
+      - name: Create Android project
+        run: |
+          npx cap add android
+          rm -rf android/app/src/main/res/mipmap-anydpi-v26
+          if [ -f icons.zip ]; then unzip -oq icons.zip -d icons; fi
+          if [ -d icons ]; then cp -r icons/* android/app/src/main/res/; fi
+          npx cap sync android
+      - name: Build APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: WealthLab-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
